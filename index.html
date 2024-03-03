@@ -1,0 +1,137 @@
+<html>
+
+<head>
+  <title> Lab3 </title>
+
+  <!--  bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+
+  <!--  jQuery -->
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+</head>
+
+
+<body class="container-fluid">
+
+  <header>
+    <h2> Building Permits in Calgary</h2>
+
+    <form onsubmit="GetDates(); return false;" id="formContainer">
+
+      <div class="row g-3">
+        <div class="col-4">
+          <label for="from" class="form-label">From:</label>
+          <input class="form-control" type="date" id="from">
+        </div>
+        <div class="col-4">
+          <label for="to" class="form-label">To:</label>
+          <input class="form-control" type="date" id="to">
+        </div>
+
+        <div class="col">
+          <label for="to" class="form-label">Get permits</label>
+          <input class="form-control" id="submitBtn" type="submit" value="Submit">
+        </div>
+      </div>
+
+      </div>
+    </form>
+
+  </header>
+
+  <main>
+
+    <div class="">
+      <div class="row">
+        <div class="col">
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+  <script>
+
+
+    let baseUrl = 'https://data.calgary.ca/resource/c2es-76ed.geojson';
+
+
+    async function GetDates() {
+
+      if (!document.querySelector('#from').value && !document.querySelector('#to').value) {
+        alert("Please select a valid date range.");
+        return;
+      };
+
+      let dateFrom = new Date(document.querySelector('#from').value).toISOString().replace('Z', '');
+      let dateTo = new Date(document.querySelector('#to').value).toISOString().replace('Z', '');
+
+      if (dateFrom > dateTo) {
+        alert("Start date is greater than end date. Please select a valid date range.");
+        return;
+      };
+
+      var url = "https://data.calgary.ca/resource/c2es-76ed.geojson?" + "$where=issueddate > " + "\'" + dateFrom + "\'" + " and issueddate < " + "\'" + dateTo + "\'";
+      const response = await fetch(url);
+      let data = await response.json();
+
+      console.log("Data", data);
+
+      var markers = L.markerClusterGroup();
+      const Geomark = L.geoJSON(data, {
+        onEachFeature: function (feature, layer) {
+          var popupContent = '<div class="popupcontent" <h4 style="text-align:center">Details</h4><hr/>Date Issued: ' + feature.properties.issueddate + '<br></br>' + 'Work Class Group: ' + feature.properties.workclassgroup + '<br></br>' + 'Contractor Name: '
+            + feature.properties.contractorname + '<br></br>' + 'Community Name: ' + feature.properties.communityname + '<br></br>' + 'Original Address: ' + feature.properties.originaladdress + '</div>';
+          layer.bindPopup(popupContent)
+        },
+      });
+      markers.addLayer(Geomark);
+      map.addLayer(markers);
+
+    }
+
+
+
+    var normalmap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      tileSize: 512,
+      zoomOffset: -1,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+
+
+    var map = L.map('map', {
+      center: [51.0447, -114.0719],
+      zoom: 12,
+      layers: [normalmap]
+    });
+
+
+    var baseMaps = {
+      "Normal Map": normalmap,
+    };
+
+    L.control.layers(baseMaps).addTo(map);
+  </script>
+  </div>
+
+</body>
+
+</html>

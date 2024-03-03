@@ -1,0 +1,57 @@
+h2 {
+  text-align: center;
+}
+
+
+#map {
+  height: 75vh;
+  width: 100%;
+  border: 2px solid #f3f3f3;
+}
+
+header {
+  background-color: black;
+  color: yellow;
+  padding: 20px 0;
+  text-align: center;
+}
+
+#formContainer {
+  width: 700px;
+  margin: 1px auto;
+  margin-top: 10px;
+}
+
+.content {
+  background-color: #f1f1f1;
+}
+
+
+#submitBtn {
+  color: yellow;
+  border: 2px solid white;
+  background-color: transparent;
+
+}
+
+
+.popupcontent {
+  background-color: black;
+  color: yellow;
+  padding: 5px 0px;
+  border-radius: 5px;
+  box-shadow: 0 0 20px 0 #000;
+  animation: popupAnimation 0.5s ease-in-out;
+}
+
+@keyframes popupAnimation {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
